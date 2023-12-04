@@ -3,24 +3,34 @@ const express = require('express')
 const router = express.Router()
 
 const Usuario = require('../models/usuario')
+const {success, fail} = require('../helpers/resposta')
 
 //cadastrar
 router.post("/cadastrar", async (req, res)=>{
     const { nome, email, senha, dataNasc } = req.body
     const data = new Date(dataNasc)
 
-    res.json(await Usuario.save(nome, email, senha, data))
+    //verificar se o email já existe
+    const user = await Usuario.getByEmail(email)
+    if (user != null) return res.status(400).json(fail('Email já cadastrado'))
+
+    res.status(200).json(success(await Usuario.save(nome, email, senha, data), "user"))
 })
 
 //login
 router.post("/login", async (req, res) => {
     let { email, senha } = req.body
+
+    //verificar se o email e senha foram enviados
+    if (!email || !senha) return res.status(400).json(fail('Email e senha são obrigatórios'))
     
-    const usuario = await Usuario.getByEmail(email, senha)
+    const usuario = await Usuario.login(email, senha)
+    
     if (usuario != null){
         const token = jwt.sign({id: usuario._id}, process.env.SECRET, {expiresIn: '1h'})
-        res.json({user: usuario, token: token})
+        res.status(200).json(success({user: usuario, token: token}, "user"))
     }
+    else return res.status(400).json(fail('Email ou senha incorretos'))
 })
 
 module.exports = router
