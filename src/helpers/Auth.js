@@ -6,7 +6,6 @@ module.exports = {
         let beartoken = req.headers['authorization'] || ""
         let token = beartoken.split(' ')[1]
         
-        console.log('Token :', token)
         if (!token) {
             return res.status(401).send({ auth: false, message: 'Não foi recebido token.' })
         }
