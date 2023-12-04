@@ -3,7 +3,12 @@ const mongoose = require("mongoose")
 const UsuarioSchema = new mongoose.Schema({
     nome: String,
     email: String,
-    senha: String
+    senha: String,
+    dataNascimento: Date,
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
 })
 
 const UsuarioModel = mongoose.model("Usuario", UsuarioSchema)
@@ -14,11 +19,24 @@ module.exports = {
         return usuarios
     },
     
-    save: async function(nome, email, senha) {
+    save: async function(nome, email, senha, data) {
         const usuario = new UsuarioModel({
             nome: nome,
             email: email,
-            senha: senha
+            senha: senha,
+            dataNascimento: data,
+        })
+        await usuario.save()
+        return usuario
+    },
+
+    createAdmin: async function(nome, email, senha, data, isAdmin) {
+        const usuario = new UsuarioModel({
+            nome: nome,
+            email: email,
+            senha: senha,
+            dataNascimento: data,
+            isAdmin: isAdmin
         })
         await usuario.save()
         return usuario
@@ -42,5 +60,12 @@ module.exports = {
 
     getById: async function(id) {
         return await UsuarioModel.findById(id).lean()
-    }
+    },
+
+    getByEmail: async function(email, senha) {
+        const user = await UsuarioModel.findOne({email: email}).lean()
+        if (user.senha == senha) {
+            return user
+        }
+    },
 }
