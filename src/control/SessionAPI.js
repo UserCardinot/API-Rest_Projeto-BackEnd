@@ -10,6 +10,10 @@ router.post("/cadastrar", async (req, res)=>{
     const { nome, email, senha, dataNasc } = req.body
     const data = new Date(dataNasc)
 
+    //verificar email válido
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+    if (!emailRegex.test(email)) return res.status(400).json(fail('Email inválido'))
+
     //verificar se o email já existe
     const user = await Usuario.getByEmail(email)
     if (user != null) return res.status(400).json(fail('Email já cadastrado'))

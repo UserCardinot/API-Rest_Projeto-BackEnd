@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 module.exports = (req, res, next) => {
-    mongoose.connect("mongodb://127.0.0.1:27017/EducaCuca").catch((err) => {
+    mongoose.connect(process.env.MONGO_URI).catch((err) => {
         console.log("Error ao conectar no banco...")
     })
     return next()    

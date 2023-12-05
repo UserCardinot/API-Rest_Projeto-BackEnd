@@ -6,17 +6,19 @@ const app = express()
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
+//Conexão com o banco de dados e validação de acesso
 app.use(require('./helpers/bd'))
-
 const auth = require('./helpers/Auth.js')
 
+//Rotas
 const sessionRouter = require('./control/SessionAPI')
 const adminRouter = require('./control/AdminAPI')
+const usersRouter = require('./control/UsersAPI')
 
-//app.use("/", home)
 app.use("/session", sessionRouter)
+app.use("/user", auth.validarAcesso, usersRouter)
 app.use("/admin", auth.validarAcesso, auth.verificaAdmin, adminRouter)
 
 app.listen(process.env.PORT, () => {
-    console.log("Running...")
+    console.log("Listening on port " + process.env.PORT + "...")
 })

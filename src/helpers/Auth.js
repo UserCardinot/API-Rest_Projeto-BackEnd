@@ -20,6 +20,6 @@ module.exports = {
     verificaAdmin: async (req, res, next) => {
         const usuario = await Usuario.getById(req.id)
         if (usuario.isAdmin) next()
-        else res.status(401).send({ auth: false, message: 'Usuário não é administrador.' })
+        else res.status(403).send({ auth: false, message: 'Usuário não é administrador.' })
     }
 }
