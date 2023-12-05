@@ -10,7 +10,7 @@ router.post('/createExercicio', auth.verificaAdmin, async (req, res) => {
     const {titulo, descricao, categoria, alternativas} = req.body
 
     if (!Exercicios) {
-        return res.status(400).json(fail('Não foi possível criar o curso'))
+        return res.status(400).json(fail('Não foi possível criar o exercicio'))
     }
     res.status(200).json(success(await Exercicios.save(titulo, descricao, categoria, alternativas), "exercicios"))
 })
@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
 //encontrar exercicio por id
 router.get('/:id', async (req, res) => {
   
-    //verificar se o curso existe
+    //verificar se o exercicio existe
     const exercicios = await Exercicios.getById(req.params.id)
     if (exercicios == null) return res.status(400).json(fail('Exercicio não encontrado'))
 
