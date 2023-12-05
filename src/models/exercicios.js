@@ -1,52 +1,51 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const ExerciciosSchema = new mongoose.Schema({
     titulo: String,
     descricao: String,
     categoria: String,
     alternativas: String,
-})
+});
 
-const ExerciciosModel = mongoose.model("exercicios", ExerciciosSchema)
+const ExerciciosModel = mongoose.model("Exercicios", ExerciciosSchema);
 
 module.exports = {
-    list: async function() {
-        const exercicios = await ExerciciosModel.find({}).lean()
-        return exercicios
+    list: async function () {
+        const exercicios = await ExerciciosModel.find({}).lean();
+        return exercicios;
     },
 
-    save: async function(titulo, descricao, categoria, alternativas) {
+    save: async function (titulo, descricao, categoria, alternativas) {
         const exercicios = new ExerciciosModel({
             titulo: titulo,
             descricao: descricao,
             categoria: categoria,
             alternativas: alternativas,
-        })
-        await exercicios.save()
-        return exercicios
+        });
+        await exercicios.save();
+        return exercicios;
     },
 
-    update: async function(id, obj) {
-
-        let exercicios = await ExerciciosModel.findById(id)
+    update: async function (id, obj) {
+        let exercicios = await ExerciciosModel.findById(id);
         if (!exercicios) {
-            return false
+            return false;
         }
-        
-        Object.keys(obj).forEach(key => exercicios[key] = obj[key])
-        await exercicios.save()
-        return exercicios
-    },
-    
-    delete: async function(id) {
-        return await ExerciciosModel.findByIdAndDelete(id)
+
+        Object.keys(obj).forEach((key) => (exercicios[key] = obj[key]));
+        await exercicios.save();
+        return exercicios;
     },
 
-    getById: async function(id) {
-        return await ExerciciosModel.findById(id).lean()
+    delete: async function (id) {
+        return await ExerciciosModel.findByIdAndDelete(id);
     },
 
-    getByTitulo: async function(titulo){
-        return await ExerciciosModel.findOne({titulo: titulo}).lean()
-    }
-}
+    getById: async function (id) {
+        return await ExerciciosModel.findById(id).lean();
+    },
+
+    getByTitulo: async function (titulo) {
+        return await ExerciciosModel.findOne({ titulo: titulo }).lean();
+    },
+};
