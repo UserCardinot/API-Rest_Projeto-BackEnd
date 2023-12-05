@@ -15,11 +15,13 @@ const sessionRouter = require('./control/SessionAPI')
 const adminRouter = require('./control/AdminAPI')
 const usersRouter = require('./control/UsersAPI')
 const cursosRouter = require('./control/CursosAPI')
+const exerciciosRouter = require('./control/exerciciosAPI.js')
 
 app.use("/session", sessionRouter)
 app.use("/user", auth.validarAcesso, usersRouter)
 app.use("/admin", auth.validarAcesso, auth.verificaAdmin, adminRouter)
 app.use("/cursos", auth.validarAcesso, cursosRouter)
+app.use("/exercicios", auth.validarAcesso, exerciciosRouter)
 
 app.listen(process.env.PORT, () => {
     console.log("Listening on port " + process.env.PORT + "...")
