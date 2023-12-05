@@ -14,8 +14,11 @@ const UsuarioSchema = new mongoose.Schema({
 const UsuarioModel = mongoose.model("Usuario", UsuarioSchema);
 
 module.exports = {
-    list: async function () {
-        const usuarios = await UsuarioModel.find({}).lean();
+    list: async function (limite, paginacao) {
+        const usuarios = await UsuarioModel.find({})
+            .skip(paginacao)
+            .limit(limite)
+            .lean();
         return usuarios;
     },
 

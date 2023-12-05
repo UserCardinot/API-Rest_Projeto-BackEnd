@@ -70,7 +70,7 @@ router.get("/all", auth.verificaAdmin, async (req, res) => {
 });
 
 //listar videoaulas por curso
-router.get("/", auth.verificaAdmin, async (req, res) => {
+router.get("/", async (req, res) => {
     const limite = req.query.limite;
     const paginacao = req.query.paginacao;
 
@@ -79,6 +79,18 @@ router.get("/", auth.verificaAdmin, async (req, res) => {
             await VideoAula.listByCurso(req.params.idCurso, limite, paginacao),
             "videoaulas"
         )
+    );
+});
+
+//encontrar videoaula por id
+router.get("/:id", async (req, res) => {
+    //verificar se a videoaula existe
+    const videoAula = await VideoAula.getById(req.params.id);
+    if (videoAula == null)
+        return res.status(400).json(fail("Videoaula não encontrada"));
+
+    res.status(200).json(
+        success(await VideoAula.getById(req.params.id), "videoaula")
     );
 });
 

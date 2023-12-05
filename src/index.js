@@ -22,7 +22,7 @@ app.use("/session", sessionRouter);
 app.use("/user", auth.validarAcesso, usersRouter);
 app.use("/admin", auth.validarAcesso, auth.verificaAdmin, adminRouter);
 app.use("/cursos", auth.validarAcesso, cursosRouter);
-app.use("/exercicios", auth.validarAcesso, exerciciosRouter);
+app.use("/:idCurso/exercicios", auth.validarAcesso, exerciciosRouter);
 app.use("/:idCurso/videoaulas", auth.validarAcesso, videoaulasRouter);
 
 app.listen(process.env.PORT, () => {

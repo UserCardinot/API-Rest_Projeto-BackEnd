@@ -5,22 +5,33 @@ const ExerciciosSchema = new mongoose.Schema({
     descricao: String,
     categoria: String,
     alternativas: String,
+    curso: {
+        type: String,
+        required: true,
+    },
 });
 
 const ExerciciosModel = mongoose.model("Exercicios", ExerciciosSchema);
 
 module.exports = {
-    list: async function () {
-        const exercicios = await ExerciciosModel.find({}).lean();
+    listByCurso: async function (idCurso, limite, paginacao) {
+        const exercicios = await ExerciciosModel.find({ curso: idCurso })
+            .skip(paginacao)
+            .limit(limite)
+            .lean();
         return exercicios;
     },
-
-    save: async function (titulo, descricao, categoria, alternativas) {
+    list: async function (limite, paginacao) {
+        const exercicios = await ExerciciosModel.find({}).lean();
+        return exercicios.slice(paginacao, limite);
+    },
+    save: async function (titulo, descricao, categoria, alternativas, idCurso) {
         const exercicios = new ExerciciosModel({
             titulo: titulo,
             descricao: descricao,
             categoria: categoria,
             alternativas: alternativas,
+            curso: idCurso,
         });
         await exercicios.save();
         return exercicios;
@@ -43,9 +54,5 @@ module.exports = {
 
     getById: async function (id) {
         return await ExerciciosModel.findById(id).lean();
-    },
-
-    getByTitulo: async function (titulo) {
-        return await ExerciciosModel.findOne({ titulo: titulo }).lean();
     },
 };
