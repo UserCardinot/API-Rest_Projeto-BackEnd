@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const bcrypt = require("bcrypt");
+
 const router = express.Router();
 
 const Usuario = require("../models/usuario");
@@ -15,18 +17,34 @@ router.post(
         const { nome, email, senha, dataNasc } = req.body;
         const data = new Date(dataNasc);
 
-        //verificar email válido
-        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-        if (!emailRegex.test(email))
-            return res.status(400).json(fail("Email inválido"));
-
         //verificar se o email já existe
         const user = await Usuario.getByEmail(email);
         if (user != null)
             return res.status(400).json(fail("Email já cadastrado"));
 
+        //encriptar a senha
+        const salt = await bcrypt.genSalt(process.env.SALT);
+        const hashedPassword = await bcrypt.hash(senha, salt).catch((err) => {
+            console.log(err);
+            return res.status(500).json(fail("Erro ao cadastrar usuário"));
+        });
+
+        const userInserted = await Usuario.save(
+            nome,
+            email,
+            hashedPassword,
+            data
+        );
+
         res.status(200).json(
-            success(await Usuario.save(nome, email, senha, data), "user")
+            success(
+                {
+                    nome: userInserted.nome,
+                    email: userInserted.email,
+                    dataNascimento: userInserted.dataNascimento,
+                },
+                "user"
+            )
         );
     }
 );
@@ -35,17 +53,35 @@ router.post(
 router.post("/login", validation(schemas.loginSchema), async (req, res) => {
     let { email, senha } = req.body;
 
-    //verificar se o email e senha foram enviados
-    if (!email || !senha)
-        return res.status(400).json(fail("Email e senha são obrigatórios"));
-
     const usuario = await Usuario.login(email, senha);
 
     if (usuario != null) {
-        const token = jwt.sign({ id: usuario._id }, process.env.SECRET, {
-            expiresIn: "1h",
-        });
-        res.status(200).json(success({ user: usuario, token: token }, "user"));
+        //verificar se a senha está correta
+        const validPass = await bcrypt
+            .compare(senha, usuario.senha)
+            .catch((err) => {
+                console.log(err);
+                return res.status(500).json(fail("Erro ao fazer login"));
+            });
+
+        if (!validPass)
+            return res.status(400).json(fail("Email ou senha incorretos"));
+        else {
+            const token = jwt.sign({ id: usuario._id }, process.env.SECRET, {
+                expiresIn: "1h",
+            });
+            res.status(200).json(
+                success(
+                    {
+                        usuario: usuario.nome,
+                        email: usuario.email,
+                        dataNasc: usuario.dataNascimento,
+                        token: token,
+                    },
+                    "user"
+                )
+            );
+        }
     } else return res.status(400).json(fail("Email ou senha incorretos"));
 });
 

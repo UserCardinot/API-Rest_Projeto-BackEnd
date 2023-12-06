@@ -65,10 +65,10 @@ module.exports = {
         return await UsuarioModel.findById(id).lean();
     },
 
-    login: async function (email, senha) {
+    login: async function (email) {
         const user = await UsuarioModel.findOne({ email: email }).lean();
         if (!user) return null;
-        else return user.senha == senha ? user : null;
+        else return user;
     },
 
     getByEmail: async function (email) {
