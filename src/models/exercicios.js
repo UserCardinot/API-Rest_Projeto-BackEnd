@@ -20,7 +20,7 @@ const ExerciciosModel = mongoose.model("Exercicios", ExerciciosSchema);
 module.exports = {
     listByCurso: async function (idCurso, limite, paginacao) {
         const exercicios = await ExerciciosModel.find({ curso: idCurso })
-            .skip(paginacao)
+            .skip(paginacao * limite)
             .limit(limite)
             .lean();
         return exercicios;

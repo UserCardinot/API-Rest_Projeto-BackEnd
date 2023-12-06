@@ -5,13 +5,13 @@ const Cursos = require("../models/cursos");
 const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta");
 const schemas = require("../helpers/joiSchemas");
-const validation = require("../helpers/validation");
+const validacao = require("../helpers/validation");
 
 //criar um curso
 router.post(
     "/",
     auth.verificaAdmin,
-    validation(schemas.cursoSchema),
+    validacao(schemas.cursoSchema),
     async (req, res) => {
         const {
             titulo,
@@ -49,7 +49,8 @@ router.post(
 router.put(
     "/:id",
     auth.verificaAdmin,
-    validation(schemas.cursoSchema),
+    validacao(schemas.cursoSchema),
+    validacao(schemas.id, "params"),
     async (req, res) => {
         const {
             titulo,
@@ -94,22 +95,34 @@ router.put(
 );
 
 //deletar um curso
-router.delete("/:id", auth.verificaAdmin, async (req, res) => {
-    //verificar se o curso existe
-    const cursos = await Cursos.getById(req.params.id);
-    if (cursos == null)
-        return res.status(400).json(fail("Curso não encontrado"));
+router.delete(
+    "/:id",
+    auth.verificaAdmin,
+    validacao(schemas.id, "params"),
+    async (req, res) => {
+        //verificar se o curso existe
+        const cursos = await Cursos.getById(req.params.id);
+        if (cursos == null)
+            return res.status(400).json(fail("Curso não encontrado"));
 
-    res.status(200).json(success(await Cursos.delete(req.params.id), "cursos"));
-});
+        res.status(200).json(
+            success(await Cursos.delete(req.params.id), "cursos")
+        );
+    }
+);
 
 //listar cursos
-router.get("/", async (req, res) => {
-    res.status(200).json(success(await Cursos.list(), "cursos"));
+router.get("/", validacao(schemas.querySchema, "query"), async (req, res) => {
+    const limite = req.query.limite;
+    const paginacao = req.query.paginacao;
+
+    res.status(200).json(
+        success(await Cursos.list(limite, paginacao), "cursos")
+    );
 });
 
 //encontrar cursos
-router.get("/:id", async (req, res) => {
+router.get("/:id", validacao(schemas.id, "params"), async (req, res) => {
     //verificar se o curso existe
     const cursos = await Cursos.getById(req.params.id);
     if (cursos == null)

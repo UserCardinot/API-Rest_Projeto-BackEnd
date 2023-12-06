@@ -32,15 +32,18 @@ const VideoAulaModel = mongoose.model("VideoAula", VideoaulaSchema);
 module.exports = {
     listByCurso: async function (idCurso, limite, paginacao) {
         const videoAulas = await VideoAulaModel.find({ curso: idCurso })
-            .skip(paginacao)
+            .skip(paginacao * limite)
             .limit(limite)
             .lean();
         return videoAulas;
     },
 
     list: async function (limite, paginacao) {
-        const videoAulas = await VideoAulaModel.find({}).lean();
-        return videoAulas.slice(paginacao, limite);
+        const videoAulas = await VideoAulaModel.find({})
+            .skip(paginacao * limite)
+            .limit(limite)
+            .lean();
+        return videoAulas;
     },
 
     save: async function (

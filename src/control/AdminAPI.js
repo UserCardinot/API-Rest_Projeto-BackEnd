@@ -56,6 +56,7 @@ router.put(
     "/:id",
     verificaAdmin,
     validacao(schemas.cadastroSchema),
+    validacao(schemas.id, "params"),
     async (req, res) => {
         const { nome, email, senha, dataNasc, isAdmin } = req.body;
         const data = new Date(dataNasc);
@@ -89,17 +90,24 @@ router.put(
     }
 );
 //deleteUser
-router.delete("/:id", verificaAdmin, async (req, res) => {
-    //verificar se o usuário existe
-    const user = await Usuario.getById(req.params.id);
-    if (user == null)
-        return res.status(400).json(fail("Usuário não encontrado"));
+router.delete(
+    "/:id",
+    verificaAdmin,
+    validacao(schemas.id, "params"),
+    async (req, res) => {
+        //verificar se o usuário existe
+        const user = await Usuario.getById(req.params.id);
+        if (user == null)
+            return res.status(400).json(fail("Usuário não encontrado"));
 
-    res.status(200).json(success(await Usuario.delete(req.params.id), "user"));
-});
+        res.status(200).json(
+            success(await Usuario.delete(req.params.id), "user")
+        );
+    }
+);
 
 //listUsers
-router.get("/", async (req, res) => {
+router.get("/", validacao(schemas.querySchema, "query"), async (req, res) => {
     const limite = req.query.limite;
     const paginacao = req.query.paginacao;
 
@@ -109,7 +117,7 @@ router.get("/", async (req, res) => {
 });
 
 //findUser
-router.get("/:id", async (req, res) => {
+router.get("/:id", validacao(schemas.id, "params"), async (req, res) => {
     //verificar se o usuário existe
     const user = await Usuario.getById(req.params.id);
     if (user == null)

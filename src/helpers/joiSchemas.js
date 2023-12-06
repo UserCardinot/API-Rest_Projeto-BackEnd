@@ -57,6 +57,13 @@ const respostaSchema = Joi.object({
     resposta: Joi.string().min(3).max(100).required(),
 });
 
+const querySchema = Joi.object({
+    limite: Joi.number().integer().valid(0, 5, 10, 30).required(),
+    paginacao: Joi.number().integer().min(0).required(),
+});
+
+const id = Joi.object({ id: Joi.string().required(), idCurso: Joi.string() });
+
 module.exports = {
     cadastroSchema,
     loginSchema,
@@ -65,4 +72,7 @@ module.exports = {
     exercicioSchema,
     videoaulasSchema,
     respostaSchema,
+    id,
+    idCurso: Joi.object({ idCurso: Joi.string().required() }),
+    querySchema,
 };

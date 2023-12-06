@@ -6,9 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-//Conexão com o banco de dados e validação de acesso
+//Helpers
 app.use(require("./helpers/bd"));
 const auth = require("./helpers/auth.js");
+const validacao = require("./helpers/validation.js");
+const schemas = require("./helpers/joiSchemas.js");
 
 //Rotas
 const sessionRouter = require("./control/SessionAPI");
@@ -26,8 +28,18 @@ app.use("/session", sessionRouter);
 app.use("/user", auth.validarAcesso, usersRouter);
 app.use("/admin", auth.validarAcesso, auth.verificaAdmin, adminRouter);
 app.use("/cursos", auth.validarAcesso, cursosRouter);
-app.use("/:idCurso/exercicios", auth.validarAcesso, exerciciosRouter);
-app.use("/:idCurso/videoaulas", auth.validarAcesso, videoaulasRouter);
+app.use(
+    "/:idCurso/exercicios",
+    validacao(schemas.idCurso, "params"),
+    auth.validarAcesso,
+    exerciciosRouter
+);
+app.use(
+    "/:idCurso/videoaulas",
+    validacao(schemas.idCurso, "params"),
+    auth.validarAcesso,
+    videoaulasRouter
+);
 
 app.get("/*", (req, res) => {
     res.status(404).json({ error: "Not found" });

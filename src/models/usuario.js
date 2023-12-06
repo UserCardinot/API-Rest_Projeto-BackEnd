@@ -17,7 +17,7 @@ const UsuarioModel = mongoose.model("Usuario", UsuarioSchema);
 module.exports = {
     list: async function (limite, paginacao) {
         const usuarios = await UsuarioModel.find({})
-            .skip(paginacao)
+            .skip(paginacao * limite)
             .limit(limite)
             .lean();
         return usuarios;

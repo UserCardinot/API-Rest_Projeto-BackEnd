@@ -6,13 +6,13 @@ const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta.js");
 
 const schemas = require("../helpers/joiSchemas.js");
-const validation = require("../helpers/validation.js");
+const validacao = require("../helpers/validation.js");
 
 //criar uma videoaula
 router.post(
     "/",
     auth.verificaAdmin,
-    validation(schemas.videoaulasSchema),
+    validacao(schemas.videoaulasSchema),
     async (req, res) => {
         const { titulo, descricao, duracao, url } = req.body;
 
@@ -41,7 +41,8 @@ router.post(
 router.put(
     "/:id",
     auth.verificaAdmin,
-    validation(schemas.videoaulasSchema),
+    validacao(schemas.videoaulasSchema),
+    validacao(schemas.id, "params"),
     async (req, res) => {
         const { titulo, descricao, duracao, url, dataPublicacao } = req.body;
 
@@ -63,16 +64,21 @@ router.put(
 );
 
 //deletar uma videoaula
-router.delete("/:id", auth.verificaAdmin, async (req, res) => {
-    //verificar se a videoaula existe
-    const videoAula = await VideoAula.getById(req.params.id);
-    if (videoAula == null)
-        return res.status(400).json(fail("Videoaula não encontrada"));
+router.delete(
+    "/:id",
+    auth.verificaAdmin,
+    validacao(schemas.id, "params"),
+    async (req, res) => {
+        //verificar se a videoaula existe
+        const videoAula = await VideoAula.getById(req.params.id);
+        if (videoAula == null)
+            return res.status(400).json(fail("Videoaula não encontrada"));
 
-    res.status(200).json(
-        success(await VideoAula.delete(req.params.id), "videoaula")
-    );
-});
+        res.status(200).json(
+            success(await VideoAula.delete(req.params.id), "videoaula")
+        );
+    }
+);
 
 //listar todas videoaulas
 router.get("/all", auth.verificaAdmin, async (req, res) => {
@@ -85,7 +91,7 @@ router.get("/all", auth.verificaAdmin, async (req, res) => {
 });
 
 //listar videoaulas por curso
-router.get("/", async (req, res) => {
+router.get("/", validacao(schemas.querySchema, "query"), async (req, res) => {
     const limite = req.query.limite;
     const paginacao = req.query.paginacao;
 
@@ -98,7 +104,7 @@ router.get("/", async (req, res) => {
 });
 
 //encontrar videoaula por id
-router.get("/:id", async (req, res) => {
+router.get("/:id", validacao(schemas.id, "params"), async (req, res) => {
     //verificar se a videoaula existe
     const videoAula = await VideoAula.getById(req.params.id);
     if (videoAula == null)

@@ -6,13 +6,13 @@ const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta.js");
 
 const schemas = require("../helpers/joiSchemas.js");
-const validation = require("../helpers/validation.js");
+const validacao = require("../helpers/validation.js");
 
 //criar um exercicio
 router.post(
     "/",
     auth.verificaAdmin,
-    validation(schemas.exercicioSchema),
+    validacao(schemas.exercicioSchema),
     async (req, res) => {
         const { titulo, descricao, categoria, alternativas, resposta } =
             req.body;
@@ -41,7 +41,8 @@ router.post(
 router.put(
     "/:id",
     auth.verificaAdmin,
-    validation(schemas.exercicioSchema),
+    validacao(schemas.exercicioSchema),
+    validacao(schemas.id, "params"),
     async (req, res) => {
         const { titulo, descricao, categoria, alternativas, resposta } =
             req.body;
@@ -64,16 +65,21 @@ router.put(
 );
 
 //deletar um exercicio
-router.delete("/:id", auth.verificaAdmin, async (req, res) => {
-    //verificar se o exercicio existe
-    const exercicios = await Exercicios.getById(req.params.id);
-    if (exercicios == null)
-        return res.status(400).json(fail("Exercicio não encontrado"));
+router.delete(
+    "/:id",
+    auth.verificaAdmin,
+    validacao(schemas.id, "params"),
+    async (req, res) => {
+        //verificar se o exercicio existe
+        const exercicios = await Exercicios.getById(req.params.id);
+        if (exercicios == null)
+            return res.status(400).json(fail("Exercicio não encontrado"));
 
-    res.status(200).json(
-        success(await Exercicios.delete(req.params.id), "exercicios")
-    );
-});
+        res.status(200).json(
+            success(await Exercicios.delete(req.params.id), "exercicios")
+        );
+    }
+);
 
 router.get("/all", async (req, res) => {
     const limite = req.query.limite;
@@ -85,7 +91,7 @@ router.get("/all", async (req, res) => {
 });
 
 //listar exercicios
-router.get("/", async (req, res) => {
+router.get("/", validacao(schemas.querySchema, "query"), async (req, res) => {
     const limite = req.query.limite;
     const paginacao = req.query.paginacao;
 
@@ -98,7 +104,7 @@ router.get("/", async (req, res) => {
 });
 
 //encontrar exercicio por id
-router.get("/:id", async (req, res) => {
+router.get("/:id", validacao(schemas.id, "params"), async (req, res) => {
     //verificar se o exercicio existe
     const exercicios = await Exercicios.getById(req.params.id);
     if (exercicios == null)

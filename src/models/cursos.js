@@ -13,8 +13,11 @@ const CursosSchema = new mongoose.Schema({
 const CursosModel = mongoose.model("Curso", CursosSchema);
 
 module.exports = {
-    list: async function () {
-        const cursos = await CursosModel.find({}).lean();
+    list: async function (limite, paginacao) {
+        const cursos = await CursosModel.find({})
+            .skip(paginacao * limite)
+            .limit(limite)
+            .lean();
         return cursos;
     },
 
