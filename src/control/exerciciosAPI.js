@@ -9,9 +9,10 @@ const { success, fail } = require("../helpers/resposta.js");
 router.post("/", auth.verificaAdmin, async (req, res) => {
     const { titulo, descricao, categoria, alternativas, resposta } = req.body;
 
-    if (!Exercicios) {
-        return res.status(400).json(fail("Não foi possível criar o exercicio"));
-    }
+    //verifica se a resposta é válida
+    if (!alternativas.includes(resposta))
+        return res.status(400).json(fail("A resposta não é válida"));
+
     res.status(200).json(
         success(
             await Exercicios.save(
