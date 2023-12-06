@@ -9,6 +9,7 @@ const UsuarioSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    respostas: [],
 });
 
 const UsuarioModel = mongoose.model("Usuario", UsuarioSchema);

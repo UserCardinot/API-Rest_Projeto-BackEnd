@@ -4,11 +4,11 @@ const ExerciciosSchema = new mongoose.Schema({
     titulo: String,
     descricao: String,
     categoria: String,
-    alternativas: {
-        type: [String],
+    alternativas: [String],
+    resposta: {
+        type: String,
         required: true,
     },
-    resposta: String,
     curso: {
         type: String,
         required: true,
@@ -29,7 +29,14 @@ module.exports = {
         const exercicios = await ExerciciosModel.find({}).lean();
         return exercicios.slice(paginacao, limite);
     },
-    save: async function (titulo, descricao, categoria, alternativas, resposta, idCurso) {
+    save: async function (
+        titulo,
+        descricao,
+        categoria,
+        alternativas,
+        resposta,
+        idCurso
+    ) {
         const exercicios = new ExerciciosModel({
             titulo: titulo,
             descricao: descricao,

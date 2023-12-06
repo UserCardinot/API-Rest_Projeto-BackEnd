@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 
 const VideoAula = require("../models/videoaula.js");
-const auth = require("../helpers/Auth.js");
+const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta.js");
 
 //criar uma videoaula

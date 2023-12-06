@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 
 const Exercicios = require("../models/exercicios.js");
-const auth = require("../helpers/Auth.js");
+const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta.js");
 
 //criar um exercicio
@@ -14,7 +14,14 @@ router.post("/", auth.verificaAdmin, async (req, res) => {
     }
     res.status(200).json(
         success(
-            await Exercicios.save(titulo, descricao, categoria, alternativas, resposta, req.params.idCurso),
+            await Exercicios.save(
+                titulo,
+                descricao,
+                categoria,
+                alternativas,
+                resposta,
+                req.params.idCurso
+            ),
             "exercicios"
         )
     );

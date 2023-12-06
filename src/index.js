@@ -8,14 +8,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //Conexão com o banco de dados e validação de acesso
 app.use(require("./helpers/bd"));
-const auth = require("./helpers/Auth.js");
+const auth = require("./helpers/auth.js");
 
 //Rotas
 const sessionRouter = require("./control/SessionAPI");
 const adminRouter = require("./control/AdminAPI");
 const usersRouter = require("./control/UsersAPI");
 const cursosRouter = require("./control/CursosAPI");
-const exerciciosRouter = require("./control/exerciciosAPI.js");
+const exerciciosRouter = require("./control/ExerciciosAPI.js");
 const videoaulasRouter = require("./control/VideoaulasAPI.js");
 
 app.use("/session", sessionRouter);

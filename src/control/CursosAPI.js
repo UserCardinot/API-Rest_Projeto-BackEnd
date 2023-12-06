@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Cursos = require("../models/cursos");
-const auth = require("../helpers/Auth.js");
+const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta");
 
 //criar um curso
