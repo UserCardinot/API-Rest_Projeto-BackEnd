@@ -5,47 +5,62 @@ const VideoAula = require("../models/videoaula.js");
 const auth = require("../helpers/auth.js");
 const { success, fail } = require("../helpers/resposta.js");
 
+const schemas = require("../helpers/joiSchemas.js");
+const validation = require("../helpers/validation.js");
+
 //criar uma videoaula
-router.post("/", auth.verificaAdmin, async (req, res) => {
-    const { titulo, descricao, duracao, url } = req.body;
+router.post(
+    "/",
+    auth.verificaAdmin,
+    validation(schemas.videoaulasSchema),
+    async (req, res) => {
+        const { titulo, descricao, duracao, url } = req.body;
 
-    if (!VideoAula) {
-        return res.status(400).json(fail("Não foi possível criar a videoaula"));
-    }
-    console.log(req.params.id);
-    res.status(200).json(
-        success(
-            await VideoAula.save(
-                req.params.idCurso,
-                titulo,
-                descricao,
-                duracao,
-                url
-            ),
-            "videoaula"
-        )
-    );
-});
-
-//atualizar uma videoaula
-router.put("/:id", auth.verificaAdmin, async (req, res) => {
-    const { titulo, descricao, duracao, url, dataPublicacao } = req.body;
-
-    //Verifica se a videoaula existe
-    let videoAula = await VideoAula.getById(req.params.id);
-    if (videoAula == null)
-        return res.status(400).json(fail("Videoaula não encontrada"));
-
-    res.status(200).json(
-        success(
-            await VideoAula.update(
-                req.params.id,
-                { titulo, descricao, duracao, url, dataPublicacao },
+        if (!VideoAula) {
+            return res
+                .status(400)
+                .json(fail("Não foi possível criar a videoaula"));
+        }
+        console.log(req.params.id);
+        res.status(200).json(
+            success(
+                await VideoAula.save(
+                    req.params.idCurso,
+                    titulo,
+                    descricao,
+                    duracao,
+                    url
+                ),
                 "videoaula"
             )
-        )
-    );
-});
+        );
+    }
+);
+
+//atualizar uma videoaula
+router.put(
+    "/:id",
+    auth.verificaAdmin,
+    validation(schemas.videoaulasSchema),
+    async (req, res) => {
+        const { titulo, descricao, duracao, url, dataPublicacao } = req.body;
+
+        //Verifica se a videoaula existe
+        let videoAula = await VideoAula.getById(req.params.id);
+        if (videoAula == null)
+            return res.status(400).json(fail("Videoaula não encontrada"));
+
+        res.status(200).json(
+            success(
+                await VideoAula.update(
+                    req.params.id,
+                    { titulo, descricao, duracao, url, dataPublicacao },
+                    "videoaula"
+                )
+            )
+        );
+    }
+);
 
 //deletar uma videoaula
 router.delete("/:id", auth.verificaAdmin, async (req, res) => {

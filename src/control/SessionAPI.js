@@ -64,9 +64,10 @@ router.post("/login", validation(schemas.loginSchema), async (req, res) => {
                 return res.status(500).json(fail("Erro ao fazer login"));
             });
 
-        if (!validPass)
+        if (!validPass) {
+            console.log("senha incorreta");
             return res.status(400).json(fail("Email ou senha incorretos"));
-        else {
+        } else {
             const token = jwt.sign({ id: usuario._id }, process.env.SECRET, {
                 expiresIn: "1h",
             });

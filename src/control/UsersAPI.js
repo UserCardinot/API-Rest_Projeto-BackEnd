@@ -1,62 +1,108 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 
 const Usuario = require("../models/usuario");
 const Exercicio = require("../models/exercicios");
 const Curso = require("../models/cursos");
 const { success, fail } = require("../helpers/resposta");
 
+const validacao = require("../helpers/validation");
+const schemas = require("../helpers/joiSchemas");
+
 //updateUser
-router.put("/", async (req, res) => {
-    const { nome, senha, dataNasc } = req.body;
+router.put("/", validacao(schemas.userSchema), async (req, res) => {
+    const { nome, email, senha, dataNasc } = req.body;
     const data = new Date(dataNasc);
 
+    //verificar se o email já existe
+    const user = await Usuario.getByEmail(email);
+    if (user != null) return res.status(400).json(fail("Email já cadastrado"));
+
+    //encriptar a senha
+    const salt = await bcrypt.genSalt(process.env.SALT);
+    const hashedPassword = await bcrypt.hash(senha, salt).catch((err) => {
+        console.log(err);
+        return res.status(500).json(fail("Erro ao cadastrar usuário"));
+    });
+
+    const userInserted = await Usuario.update(req.id, {
+        nome,
+        email,
+        hashedPassword,
+        data,
+    });
+
     res.status(200).json(
-        success(await Usuario.update(req.id, { nome, senha, data }), "user")
+        success(
+            {
+                nome: userInserted.nome,
+                email: userInserted.email,
+                dataNascimento: userInserted.dataNascimento,
+            },
+            "user"
+        )
     );
 });
 
-//find
+//retorna o usuário
 router.get("/", async (req, res) => {
-    res.status(200).json(success(await Usuario.getById(req.id), "user"));
+    const user = await Usuario.getById(req.id);
+
+    res.status(200).json(
+        success(
+            {
+                nome: user.nome,
+                email: user.email,
+                dataNascimento: user.dataNascimento,
+            },
+            "user"
+        )
+    );
 });
 
 //responder exercício
-router.post("/responder", async (req, res) => {
-    const { idExercicio, resposta } = req.body;
+router.post(
+    "/responder",
+    validacao(schemas.respostaSchema),
+    async (req, res) => {
+        const { idExercicio, resposta } = req.body;
 
-    //verifica se o exercício existe
-    const exercicio = await Exercicio.getById(idExercicio);
-    if (exercicio == null)
-        return res.status(400).json(fail("Exercicio não encontrado"));
+        //verifica se o exercício existe
+        const exercicio = await Exercicio.getById(idExercicio);
+        if (exercicio == null)
+            return res.status(400).json(fail("Exercicio não encontrado"));
 
-    //verifica se a resposta é válida
-    const alternativas = exercicio.alternativas;
-    if (!alternativas.includes(resposta))
-        return res.status(400).json(fail("Alternativa inválida"));
+        //verifica se a resposta é válida
+        const alternativas = exercicio.alternativas;
+        if (!alternativas.includes(resposta))
+            return res.status(400).json(fail("Alternativa inválida"));
 
-    const user = await Usuario.getById(req.id);
-    const respostas = user.respostas;
-    const status = exercicio.resposta == resposta ? "correta" : "incorreta";
+        const user = await Usuario.getById(req.id);
+        const respostas = user.respostas;
+        const status = exercicio.resposta == resposta ? "correta" : "incorreta";
 
-    const respostaObj = {
-        exercicio: idExercicio,
-        status: status,
-        resposta: resposta,
-        data: new Date(),
-    };
+        const respostaObj = {
+            exercicio: idExercicio,
+            status: status,
+            resposta: resposta,
+            data: new Date(),
+        };
 
-    //verifica se o usuário já respondeu o exercício
-    const exRespondido = respostas.find((ex) => ex.exercicio == idExercicio);
-    if (exRespondido) {
-        const index = respostas.indexOf(exRespondido);
-        respostas[index] = respostaObj;
-    } else respostas.push(respostaObj);
+        //verifica se o usuário já respondeu o exercício
+        const exRespondido = respostas.find(
+            (ex) => ex.exercicio == idExercicio
+        );
+        if (exRespondido) {
+            const index = respostas.indexOf(exRespondido);
+            respostas[index] = respostaObj;
+        } else respostas.push(respostaObj);
 
-    await Usuario.update(req.id, { respostas: respostas });
+        await Usuario.update(req.id, { respostas: respostas });
 
-    res.status(200).json(success(respostaObj, "resposta"));
-});
+        res.status(200).json(success(respostaObj, "resposta"));
+    }
+);
 
 //Porcentagem de acertos por curso
 router.get("/acertos", async (req, res) => {

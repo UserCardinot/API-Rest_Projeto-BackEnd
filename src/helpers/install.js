@@ -12,6 +12,9 @@ router.get("/", async (req, res) => {
     const senha = await bcrypt.hash("12345678", 10).catch((err) => {
         res.status(500).json(fail("Erro ao encriptar senha"));
     });
+    const senhaAdmin = await bcrypt.hash("admin123", 10).catch((err) => {
+        res.status(500).json(fail("Erro ao encriptar senha"));
+    });
 
     let users = [];
     for (let i = 0; i < nomes.length; i++) {
@@ -30,7 +33,7 @@ router.get("/", async (req, res) => {
     users.push({
         nome: "Admin",
         email: "admin@email.com",
-        senha: "admin",
+        senha: senhaAdmin,
         dataNascimento: new Date("02-02-2000"),
         isAdmin: true,
     });
@@ -45,9 +48,9 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(
         success(
-            "Usuários criados com sucesso. Senha dos usuários: 12345678 " +
+            "|| Usuários criados com sucesso.|| Senha dos usuários: 12345678 || " +
                 "Credenciais de Administrador: " +
-                "email: admin@email.com senha: admin",
+                "email: admin@email.com senha: admin123 ||",
             "Observacoes"
         )
     );

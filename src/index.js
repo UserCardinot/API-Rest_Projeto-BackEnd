@@ -29,6 +29,10 @@ app.use("/cursos", auth.validarAcesso, cursosRouter);
 app.use("/:idCurso/exercicios", auth.validarAcesso, exerciciosRouter);
 app.use("/:idCurso/videoaulas", auth.validarAcesso, videoaulasRouter);
 
+app.get("/*", (req, res) => {
+    res.status(404).json({ error: "Not found" });
+});
+
 app.listen(process.env.PORT, () => {
     console.log("Listening on port " + process.env.PORT + "...");
 });
