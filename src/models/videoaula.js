@@ -83,4 +83,6 @@ module.exports = {
         const videoAula = await VideoAulaModel.findById(id).lean();
         return videoAula;
     },
+
+    VideoAulaModel,
 };

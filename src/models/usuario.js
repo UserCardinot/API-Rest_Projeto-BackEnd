@@ -75,5 +75,5 @@ module.exports = {
         return await UsuarioModel.findOne({ email: email }).lean();
     },
 
-    UsuarioModel: UsuarioModel,
+    UsuarioModel,
 };

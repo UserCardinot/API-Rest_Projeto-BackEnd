@@ -62,5 +62,6 @@ module.exports = {
     getByTitulo: async function (titulo) {
         return await CursosModel.findOne({ titulo: titulo }).lean();
     },
+
     CursosModel,
 };
