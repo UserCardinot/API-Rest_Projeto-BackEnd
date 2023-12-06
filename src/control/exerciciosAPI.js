@@ -7,14 +7,14 @@ const { success, fail } = require("../helpers/resposta.js");
 
 //criar um exercicio
 router.post("/", auth.verificaAdmin, async (req, res) => {
-    const { titulo, descricao, categoria, alternativas } = req.body;
+    const { titulo, descricao, categoria, alternativas, resposta } = req.body;
 
     if (!Exercicios) {
         return res.status(400).json(fail("Não foi possível criar o exercicio"));
     }
     res.status(200).json(
         success(
-            await Exercicios.save(titulo, descricao, categoria, alternativas),
+            await Exercicios.save(titulo, descricao, categoria, alternativas, resposta, req.params.idCurso),
             "exercicios"
         )
     );
@@ -22,7 +22,7 @@ router.post("/", auth.verificaAdmin, async (req, res) => {
 
 //atualizar um exercicio
 router.put("/:id", auth.verificaAdmin, async (req, res) => {
-    const { titulo, descricao, categoria, alternativas } = req.body;
+    const { titulo, descricao, categoria, alternativas, resposta } = req.body;
 
     //Verifica se o exercicio existe
     let exercicios = await Exercicios.getById(req.params.id);
@@ -33,7 +33,7 @@ router.put("/:id", auth.verificaAdmin, async (req, res) => {
         success(
             await Exercicios.update(
                 req.params.id,
-                { titulo, descricao, categoria, alternativas },
+                { titulo, descricao, categoria, alternativas, resposta },
                 "exercicios"
             )
         )
