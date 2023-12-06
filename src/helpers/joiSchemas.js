@@ -1,0 +1,34 @@
+const Joi = require("@hapi/joi");
+
+const cadastroSchema = Joi.object({
+    nome: Joi.string().min(3).max(30).required(),
+    email: Joi.string()
+        .email({ tlds: { allow: false } })
+        .required(),
+    senha: Joi.string().min(8).max(12).alphanum().required(),
+    dataNasc: Joi.string().length(10).required(),
+    isAdmin: Joi.boolean(),
+});
+
+const loginSchema = Joi.object({
+    email: Joi.string()
+        .email({ tlds: { allow: false } })
+        .required(),
+    senha: Joi.string().min(8).max(12).alphanum().required(),
+});
+
+const cursoSchema = Joi.object({
+    titulo: Joi.string().min(5).max(50).required(),
+    descricao: Joi.string().min(0).max(5000).required(),
+    cargaHoraria: Joi.string().min(3).max(30).required(),
+    categoria: Joi.string().min(3).max(30).required(),
+    dataInicio: Joi.string().length(10).required(),
+    dataFim: Joi.string().length(10).required(),
+    url: Joi.string().min(3).max(100).required(),
+});
+
+module.exports = {
+    cadastroSchema,
+    loginSchema,
+    cursoSchema,
+};

@@ -18,6 +18,10 @@ const cursosRouter = require("./control/CursosAPI");
 const exerciciosRouter = require("./control/ExerciciosAPI.js");
 const videoaulasRouter = require("./control/VideoaulasAPI.js");
 
+const installRouter = require("./helpers/install.js");
+
+app.use("/install", installRouter);
+
 app.use("/session", sessionRouter);
 app.use("/user", auth.validarAcesso, usersRouter);
 app.use("/admin", auth.validarAcesso, auth.verificaAdmin, adminRouter);

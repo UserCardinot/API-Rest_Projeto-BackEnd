@@ -103,7 +103,7 @@ router.get("/acertos", async (req, res) => {
         return {
             curso: curso.idCurso,
             titulo: curso.titulo,
-            acertos: acertos.toFixed(2),
+            acertos: acertos.toFixed(3),
         };
     });
 

@@ -74,4 +74,6 @@ module.exports = {
     getByEmail: async function (email) {
         return await UsuarioModel.findOne({ email: email }).lean();
     },
+
+    UsuarioModel: UsuarioModel,
 };
