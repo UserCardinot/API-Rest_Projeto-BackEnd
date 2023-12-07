@@ -6,6 +6,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+//Swagger
+const swaggerFile = require("./helpers/swagger_output.json");
+const swagg = require("swagger-ui-express");
+
 //Helpers
 app.use(require("./helpers/bd"));
 const auth = require("./helpers/auth.js");
@@ -23,6 +27,7 @@ const videoaulasRouter = require("./control/VideoaulasAPI.js");
 const installRouter = require("./helpers/install.js");
 
 app.use("/install", installRouter);
+app.use("/docs", swagg.serve, swagg.setup(swaggerFile));
 
 app.use("/session", sessionRouter);
 app.use("/user", auth.validarAcesso, usersRouter);
