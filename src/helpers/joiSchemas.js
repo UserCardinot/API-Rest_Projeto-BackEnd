@@ -16,7 +16,7 @@ const userSchema = Joi.object({
         .email({ tlds: { allow: false } })
         .required(),
     senha: Joi.string().min(8).max(12).alphanum().required(),
-    dataNasc: Joi.string().length(10).required(),
+    dataNasc: Joi.string().min(10).required(),
     isAdmin: Joi.boolean(),
 });
 
@@ -32,8 +32,8 @@ const cursoSchema = Joi.object({
     descricao: Joi.string().min(0).max(5000).required(),
     cargaHoraria: Joi.string().min(1).max(30).required(),
     categoria: Joi.string().min(3).max(30).required(),
-    dataInicio: Joi.string().length(10).required(),
-    dataFim: Joi.string().length(10).required(),
+    dataInicio: Joi.string().min(10).required(),
+    dataFim: Joi.string().min(10).required(),
     url: Joi.string().min(3).max(100).required(),
 });
 

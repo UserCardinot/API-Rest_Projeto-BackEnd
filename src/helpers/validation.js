@@ -24,6 +24,27 @@ module.exports =
             }
         } else {
             const { error, value } = schema.validate(req.body);
+            const dados = req.body;
+            let invalidDate = false;
+
+            Object.keys(dados).forEach((key) => {
+                if (key.match(/data/gi)) {
+                    const data = new Date(dados[key]);
+
+                    if (isNaN(data.getTime())) {
+                        invalidDate = true;
+                    } else if (data instanceof Date) {
+                        req.body[key] = data;
+                    }
+                }
+            });
+
+            if (invalidDate) {
+                return res.status(400).json({
+                    status: false,
+                    message: "Data inválida",
+                });
+            }
 
             if (error) {
                 // Validation failed

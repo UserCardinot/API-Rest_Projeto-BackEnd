@@ -22,7 +22,6 @@ router.post(
     validacao(schemas.cadastroSchema),
     async (req, res) => {
         const { nome, email, senha, dataNasc, isAdmin } = req.body;
-        const data = new Date(dataNasc);
 
         //verificar se o email já existe
         const user = await Usuario.getByEmail(email);
@@ -36,13 +35,15 @@ router.post(
             return res.status(500).json(fail("Erro ao cadastrar usuário"));
         });
 
+        console.log(dataNasc, typeof dataNasc);
+
         res.status(200).json(
             success(
                 await Usuario.createAdmin(
                     nome,
                     email,
                     hashedPassword,
-                    data,
+                    dataNasc,
                     isAdmin
                 ),
                 "user"
