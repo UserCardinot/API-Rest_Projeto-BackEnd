@@ -54,11 +54,11 @@ const videoaulasSchema = Joi.object({
 
 const respostaSchema = Joi.object({
     idExercicio: Joi.string().required(),
-    resposta: Joi.string().min(3).max(100).required(),
+    resposta: Joi.string().min(1).max(100).required(),
 });
 
 const querySchema = Joi.object({
-    limite: Joi.number().integer().valid(0, 5, 10, 30).required(),
+    limite: Joi.number().integer().valid(5, 10, 30).required(),
     paginacao: Joi.number().integer().min(0).required(),
 });
 

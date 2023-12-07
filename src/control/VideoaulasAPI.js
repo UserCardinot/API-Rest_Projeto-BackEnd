@@ -81,14 +81,19 @@ router.delete(
 );
 
 //listar todas videoaulas
-router.get("/all", auth.verificaAdmin, async (req, res) => {
-    const limite = req.query.limite;
-    const paginacao = req.query.paginacao;
+router.get(
+    "/all",
+    validacao(schemas.querySchema, "query"),
+    auth.verificaAdmin,
+    async (req, res) => {
+        const limite = req.query.limite;
+        const paginacao = req.query.paginacao;
 
-    res.status(200).json(
-        success(await VideoAula.list(limite, paginacao), "videoaulas")
-    );
-});
+        res.status(200).json(
+            success(await VideoAula.list(limite, paginacao), "videoaulas")
+        );
+    }
+);
 
 //listar videoaulas por curso
 router.get("/", validacao(schemas.querySchema, "query"), async (req, res) => {

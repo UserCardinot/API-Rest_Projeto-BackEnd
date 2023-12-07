@@ -3,7 +3,17 @@ module.exports =
     (req, res, next) => {
         if (req_type === "query") {
             const { error, value } = schema.validate(req.query);
-            console.log(req.query.limite);
+
+            if (req.query.paginacao) {
+                req.query.paginacao--;
+
+                if (req.query.paginacao < 0) {
+                    res.status(400).json({
+                        status: false,
+                        error: "Paginação deve começar em 1",
+                    });
+                }
+            }
 
             if (error) {
                 // Validation failed
