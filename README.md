@@ -10,6 +10,8 @@ Este é um projeto para a disciplina de Programação Web: Back-end, com o objet
 * Documentação (Swagger)
 * Autenticação de usuário (JWT)
 
+O objetivo desse projeto é oferecer cursos, video-aulas e exercícios para treinamento de vestibulandos gratuitamente. A API tem funcionalidades para gerenciar estes recursos e fazer o cadastros de novos alunos. A lógica de negócio implementada oferece ao aluno um meio de responder exercícios salvos de cada curso, e além disso fazer uma média de acertos por curso.
+
 ## Instalação
 
 1. Faça <a href="https://github.com/UserCardinot/API-Rest_Projeto-BackEnd/archive/refs/heads/main.zip">download<a> do projeto
