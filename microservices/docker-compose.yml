@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # MongoDB para Auth Service
+  mongodb-auth:
+    image: mongo:7.0
+    container_name: mongodb-auth
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: auth_service
+    volumes:
+      - mongodb_auth_data:/data/db
+    networks:
+      - microservices-network
+
+  # MongoDB para Core Service
+  mongodb-core:
+    image: mongo:7.0
+    container_name: mongodb-core
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: core_service
+    volumes:
+      - mongodb_core_data:/data/db
+    networks:
+      - microservices-network
+
+  # Redis para cache e sessões
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - microservices-network
+
+  # Eureka Server
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_PORT=8761
+      - NODE_ENV=production
+    networks:
+      - microservices-network
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - GATEWAY_PORT=8080
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - CORE_SERVICE_URL=http://core-service:8082
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+    depends_on:
+      - eureka-server
+      - auth-service
+      - core-service
+    networks:
+      - microservices-network
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - AUTH_PORT=8081
+      - MONGODB_URI=mongodb://admin:password123@mongodb-auth:27017/auth_service?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+      - BCRYPT_ROUNDS=12
+    depends_on:
+      - mongodb-auth
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Core Service
+  core-service:
+    build: ./core-service
+    container_name: core-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      - CORE_PORT=8082
+      - MONGODB_URI=mongodb://admin:password123@mongodb-core:27017/core_service?authSource=admin
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+    depends_on:
+      - mongodb-core
+      - eureka-server
+    networks:
+      - microservices-network
+
+volumes:
+  mongodb_auth_data:
+  mongodb_core_data:
+  redis_data:
+
+networks:
+  microservices-network:
+    driver: bridge
